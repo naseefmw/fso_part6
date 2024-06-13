@@ -10,21 +10,26 @@ const AnecdoteForm = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
     },
+    onError: (error) => {
+      dispatch({ type: 'ERROR', payload: error.response.data.error })
+      setTimeout(() => {
+        dispatch({ type: 'RESET' })
+      }, 5000)
+    },
   })
 
   const addAnecdote = async (event) => {
     event.preventDefault()
     const content = event.target.anecdote.value
     event.target.anecdote.value = ''
-    if (content.length > 4) {
-      newAnecdoteMutation.mutate({ content, votes: 0 })
 
-      await dispatch({ type: 'ADD', payload: content })
+    newAnecdoteMutation.mutate({ content, votes: 0 })
 
-      setTimeout(() => {
-        dispatch({ type: 'RESET' })
-      }, 5000)
-    } else console.log('too short')
+    await dispatch({ type: 'ADD', payload: content })
+
+    setTimeout(() => {
+      dispatch({ type: 'RESET' })
+    }, 5000)
   }
 
   return (
